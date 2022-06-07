@@ -2,9 +2,11 @@ class Equation:
 
     def __init__(self, equation):
         self.equation = equation
+
     """Method that dividing equations into 2 lists and preparing these objects for 
     formatting and converting into right types    
     """
+
     def divide_equation(self):
         # Creating 2 lists with left and right sides of equation
         equation_list_left = []
@@ -30,16 +32,21 @@ class Equation:
         proper_equation_list_right = self.numbers_unite(equation_list_right)
         self.find_type_of_equation(proper_equation_list_left, proper_equation_list_right)
 
-    def numbers_unite(self, equation_side):
-
-        self.equation_site = equation_side
+    @staticmethod
+    def numbers_unite(equation_side):
+        """Uniting all numbers, that for now are divided, into 1 object
+        and adding it to a new list, ready for further actions to get result
+        """
         proper_equation_side = []
         digit = []
-
+        count = 1
         for i in equation_side:
             if i.isdigit():
                 digit.append(i)
+            elif not i.isdigit() and i == "-":
+                digit.append(i)
             elif not i.isdigit():
+                count += 1
                 number = "".join(digit)
                 if number != "":
                     proper_equation_side.append(number)
@@ -50,28 +57,45 @@ class Equation:
         proper_equation_side.remove("$")
         return proper_equation_side
 
-    def find_type_of_equation(self, left_side, right_side):
+    @staticmethod
+    def find_type_of_equation(left_side, right_side):
 
+        equation_variable = "x"
         length_left = len(left_side)
         length_right = len(right_side)
-        a = float(left_side[0])
-        b = float(right_side[0])
+        """Fix an issue with minus symbol before number, that causes exception.
+        Forcing search for minus and if it exists - convert string object into
+        float with this minus
+        """
+        for i in left_side[0]:
+            if i == "-":
+                x = left_side[0].lstrip("-")
+                left_side[0] = float(x) - float(x)*2
+        # Defining variables and fix the issue with revers x input, like this - x5=10
+        if left_side[0] != equation_variable:
+            a = float(left_side[0])
+        else:
+            a = float(left_side[1])
+        if right_side[0] != equation_variable:
+            b = float(right_side[0])
+        else:
+            b = float(right_side[1])
 
         # Simple equation with *
         if length_left == 2 and length_right == 1:
             print("Simple equation with *")
-            SimpleEquation(a, b, is_simple=True)
-
+            SimpleEquation(a, b, is_simple=True, orientation=False)
+        elif length_left == 1 and length_right == 2:
+            SimpleEquation(a, b, is_simple=True, orientation=True)
         # Other variations of simple equations
-        elif length_left == 3 and length_right == 1:
-            print("ololo")
-            math_operator = float(left_side[1])
-            SimpleEquation(a, b, math_operator=math_operator)
+        else:
+            print("other variation")
 
 
 class SimpleEquation:
 
-    def __init__(self, a, b, is_simple=False, math_operator=""):
+    def __init__(self, a, b, is_simple=False, math_operator="", orientation=False):
+        self.orientation = orientation
         self.math_operator = math_operator
         self.is_simple = is_simple
         self.b = b
@@ -83,8 +107,14 @@ class SimpleEquation:
             self.simple_non_multiply()
 
     def simple_multiply(self):
+        # Result for standart (like 2x=4)
         result = self.b / self.a
-        print("x=" + str(self.b) + "/" + str(self.a))
+        # Printing process for reversed (4=2x) or standart (2x=4)
+        if self.orientation:
+            result = self.a / self.b
+            print("x=" + str(self.a) + "/" + str(self.b))
+        else:
+            print("x=" + str(self.b) + "/" + str(self.a))
         print(f"x={result}")
 
     def simple_non_multiply(self):
@@ -98,5 +128,7 @@ class SimpleEquation:
 
 
 if __name__ == "__main__":
-    exercise = Equation("2x=4")
-    exercise.divide_equation()
+    while True:
+        inp = input("Введіть рівняння: ")
+        exercise = Equation(inp)
+        exercise.divide_equation()
