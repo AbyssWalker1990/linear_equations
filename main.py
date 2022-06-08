@@ -39,14 +39,13 @@ class Equation:
         """
         proper_equation_side = []
         digit = []
-        count = 1
+        count = 1  # Counter for separate "-" symbol from index 0 from another indexes
         for i in equation_side:
             if i.isdigit():
                 digit.append(i)
-            elif not i.isdigit() and i == "-":
+            elif not i.isdigit() and i == "-" and count == 1:
                 digit.append(i)
             elif not i.isdigit():
-                count += 1
                 number = "".join(digit)
                 if number != "":
                     proper_equation_side.append(number)
@@ -54,6 +53,7 @@ class Equation:
                 digit = []
             else:
                 print("Error")
+            count += 1
         proper_equation_side.remove("$")
         return proper_equation_side
 
@@ -82,6 +82,12 @@ class Equation:
             prep_value = Equation.preparing_values_for_simple(left_side, right_side)
             a, b = prep_value[0], prep_value[1]
             SimpleEquation(a, b, is_simple=True, orientation=True)
+        elif length_left == 3 and length_right == 1:
+            prep_value = Equation.preparing_values_for_simple(left_side, right_side)
+            a, b = prep_value[0], prep_value[1]
+            math_operator = prep_value[2]
+            SimpleEquation(a, b, math_operator=math_operator, orientation=False)
+
         # Other variations of simple equations
         else:
             print("other variation")
@@ -91,18 +97,51 @@ class Equation:
         """Checking for the right values for simplest equations like 4x=8
         and creating a list
         """
+        math_operators = ("+", "-", "/", "*")
+        operator = "$"      # Defining operator to avoid error if it will not be define while checking
+        check_left = False
+        check_right = False
         equation_variable = "x"
         values = []
-        if left_side[0] != equation_variable:
+
+        # Checking if we have math operators in both sides of equation
+        for i in math_operators:
+            for item in left_side:
+                if i == item:
+                    check_left = True
+            for item in right_side:
+                if i == item:
+                    check_right = True
+
+        if not check_left and not check_right:
+            if left_side[0] != equation_variable:
+                a = float(left_side[0])
+            else:
+                a = float(left_side[1])
+            if right_side[0] != equation_variable:
+                b = float(right_side[0])
+            else:
+                b = float(right_side[1])
+        elif check_left and left_side[0] != equation_variable:
             a = float(left_side[0])
-        else:
-            a = float(left_side[1])
-        if right_side[0] != equation_variable:
             b = float(right_side[0])
-        else:
-            b = float(right_side[1])
+            operator = left_side[1]
+        elif check_left and left_side[0] == equation_variable:
+            a = float(left_side[2])
+            b = float(right_side[0])
+            operator = left_side[1]
+        elif check_right:
+            a = float(right_side[0])
+            b = float(left_side[0])
+            operator = right_side[1]
+        elif check_right and right_side[0] != equation_variable:
+            a = float(right_side[2])
+            b = float(left_side[0])
+            operator = right_side[1]
         values.append(a)
         values.append(b)
+        values.append(operator)
+
         return values
 
 
@@ -133,12 +172,16 @@ class SimpleEquation:
 
     def simple_non_multiply(self):
 
-        if self.math_operator == "-":
-            if self.a < self.b:
-                print("oops")
-            else:
-                result = self.a - self.b
-                print(result)
+        if self.math_operator == "+":
+            print(f"x={self.b}-{self.a}")
+            result = self.b - self.a
+        elif self.math_operator == "-":
+            print(f"x={self.a}-{self.b}")
+            result = self.a - self.b
+        elif self.math_operator == "/":
+            print(f"x={self.a}/{self.b}")
+            result = self.a / self.b
+        print(result)
 
 
 if __name__ == "__main__":
