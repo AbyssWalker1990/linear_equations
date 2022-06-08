@@ -60,18 +60,39 @@ class Equation:
     @staticmethod
     def find_type_of_equation(left_side, right_side):
 
-        equation_variable = "x"
         length_left = len(left_side)
         length_right = len(right_side)
         """Fix an issue with minus symbol before number, that causes exception.
         Forcing search for minus and if it exists - convert string object into
         float with this minus
         """
+        # Fix the issue with revers x input, like this - x5=10
         for i in left_side[0]:
             if i == "-":
                 x = left_side[0].lstrip("-")
-                left_side[0] = float(x) - float(x)*2
-        # Defining variables and fix the issue with revers x input, like this - x5=10
+                left_side[0] = float(x) - float(x) * 2
+
+        # Simple equation with *
+        if length_left == 2 and length_right == 1:
+            print("Simple equation with *")
+            prep_value = Equation.preparing_values_for_simple(left_side, right_side)
+            a, b = prep_value[0], prep_value[1]
+            SimpleEquation(a, b, is_simple=True, orientation=False)
+        elif length_left == 1 and length_right == 2:
+            prep_value = Equation.preparing_values_for_simple(left_side, right_side)
+            a, b = prep_value[0], prep_value[1]
+            SimpleEquation(a, b, is_simple=True, orientation=True)
+        # Other variations of simple equations
+        else:
+            print("other variation")
+
+    @staticmethod
+    def preparing_values_for_simple(left_side, right_side):
+        """Checking for the right values for simplest equations like 4x=8
+        and creating a list
+        """
+        equation_variable = "x"
+        values = []
         if left_side[0] != equation_variable:
             a = float(left_side[0])
         else:
@@ -80,16 +101,9 @@ class Equation:
             b = float(right_side[0])
         else:
             b = float(right_side[1])
-
-        # Simple equation with *
-        if length_left == 2 and length_right == 1:
-            print("Simple equation with *")
-            SimpleEquation(a, b, is_simple=True, orientation=False)
-        elif length_left == 1 and length_right == 2:
-            SimpleEquation(a, b, is_simple=True, orientation=True)
-        # Other variations of simple equations
-        else:
-            print("other variation")
+        values.append(a)
+        values.append(b)
+        return values
 
 
 class SimpleEquation:
